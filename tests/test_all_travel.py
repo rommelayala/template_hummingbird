@@ -1,0 +1,10 @@
+from test_veepee_travel_fr import test_travel_page_campaigns # noqa
+from test_veepee_travel_es import test_travel_page_campaigns # noqa
+from test_veepee_travel_it import test_travel_page_campaigns # noqa
+from test_veepee_priv_travel_es import test_travel_page_campaigns # noqa
+from test_veepee_priv_travel_it import test_travel_page_campaigns # noqa
+from test_veepee_travel_at import test_travel_page_campaigns # noqa
+from test_veepee_travel_be import test_travel_page_campaigns # noqa
+from test_veepee_travel_de import test_travel_page_campaigns # noqa
+from test_veepee_travel_lu import test_travel_page_campaigns # noqa
+from test_veepee_travel_nl import test_travel_page_campaigns # noqa

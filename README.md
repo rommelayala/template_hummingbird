@@ -45,6 +45,8 @@ Microsoft is actively developing Playwright,
  $ pip3 install playwright
  $ pip3 install pytest
  $ pip3 install pytest-playwright
+ $ playwright install (Debian)
+ $ sudo playwright install-deps (Debian)
 ```
 
 You can check all installed packages using pip3 freeze. They should look something like this:
@@ -85,7 +87,12 @@ websockets==10.1
 7. Run the init test
 
 ```
- $ pytest tests/test_homepage_components.py
+In order eecute all test to log data into elastic is necessary to run this command
+$  export RUN_TYPE="manual" &&  python3 tests/test_veepee_privalia_es.py
+```
+Is possible to have issues if you are running this command
+``` 
+$ pytest tests/test_homepage_components.py
 or
  $ python3 test_homepage_components.py
 ```

@@ -1,0 +1,10 @@
+from test_veepee_fr import test_home_page_check_campaigns as test_fr # noqa
+from test_veepee_es import test_home_page_check_campaigns as test_es # noqa
+from test_veepee_it import test_home_page_check_campaigns as test_it # noqa
+from test_veepee_privalia_es import test_home_page_check_campaigns as test_pri_es # noqa
+from test_veepee_privalia_it import test_home_page_check_campaigns as test_pri_it # noqa
+from test_veepee_at import test_home_page_check_campaigns as test_at # noqa
+from test_veepee_be import test_home_page_check_campaigns as test_be # noqa
+from test_veepee_de import test_home_page_check_campaigns as test_de # noqa
+from test_veepee_lu import test_home_page_check_campaigns as test_lu # noqa
+from test_veepee_nl import test_home_page_check_campaigns as test_nl # noqa

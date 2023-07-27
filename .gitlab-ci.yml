@@ -1,0 +1,54 @@
+---
+include:
+  - project: veepee/foundation/products/mom/platform/ci-cd/docker-build
+    ref: 1.5.2
+    file: gitlab-ci-docker.yml
+
+variables:
+  APP_NAME: hummingbird
+
+stages:
+  - lint
+  - release
+  - publish
+  - salescheck
+
+
+publish-release:docker:
+  rules:
+    - if: '$CI_PIPELINE_SOURCE != "schedule"'
+
+semantic-release:
+  rules:
+    - if: '$CI_PIPELINE_SOURCE != "schedule"'
+
+check-opening-sales-fr:
+  stage: salescheck
+  image: registry.noc.vpgrp.io/hummingbird:latest
+  script:
+    - export RUN_TYPE="scheduled" && python3 tests/test_veepee_fr.py
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "schedule"'
+  artifacts:
+    paths:
+      - "*.jpg"
+    when: always
+    expire_in: 5 days
+
+################################################################
+check-opening-travel-sales-fr:
+  stage: salescheck
+  image: registry.noc.vpgrp.io/hummingbird:latest
+  script:
+    - export RUN_TYPE="scheduled" && python3 tests/test_veepee_travel_fr.py
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "schedule"'
+  artifacts:
+    paths:
+      - "*.jpg"
+    when: always
+    expire_in: 5 days
+
+
+################################################################
+# EOF

@@ -1,4 +1,4 @@
-FROM python:3.11.3-slim-bullseye
+FROM docker.registry.vptech.eu/python:3.11.3-slim-bullseye
 
 RUN apt-get update -qq --fix-missing \
  && apt-get -qq -y install --no-install-recommends tzdata \
