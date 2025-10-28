@@ -21,7 +21,10 @@ def test_homepage_check_homepage_main_banner(page: Page):
 
 
 def run(playwright):
-    browser = playwright.chromium.launch()
+    browser = playwright.chromium.launch(
+         headless=False,
+        # slow_mo = 1000
+    )
     with browser.new_context() as context:
         page = context.new_page()
         page.mouse.move(100, 100)

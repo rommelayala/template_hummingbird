@@ -52,6 +52,7 @@ Microsoft is actively developing Playwright,
 You can check all installed packages using pip3 freeze. They should look something like this:
 
 ```
+ $ pip install -r requirements.txt
  $ pip3 freeze
 attrs==21.2.0
 certifi==2021.10.8
