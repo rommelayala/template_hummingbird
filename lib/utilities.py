@@ -15,68 +15,6 @@ def take_screenshot(page, source="_need_to_pass_the_source"):
     page.screenshot(path=str_timestamp + f"_{source}_.jpg")
     # ----------------------------------------------------------------
 
-
-def get_ulr_travel(key_country, href_url):
-    vp_root_link = variables.vp_sites_map[key_country]['vp_site_root_url']
-
-    if href_url.startswith("/web/catalog/v1/sale/") or href_url.startswith("/ns/"):
-        url = f"{vp_root_link}+{href_url}"
-    else:
-        playwright.util.url.URL(href_url)
-
-    return url
-
-
-def logging_out(page):
-    try:
-        logging.debug(".........Logging OUT.........")
-        page.locator("div[id='menuBtn']").click()
-        page.locator("a[href*='/logout/']").click()
-        logging.debug("---- SUCCESS Logging OUT ----")
-
-    except Exception as e:
-        logging.debug("---- FAILED Logging OUT ----")
-        logging.error(e)
-
-
-def get_href_a_lazy_a(campaign):
-    href = None
-
-    try:
-        web_element_a_father = campaign.evaluate_handle('(element) => element.parentElement')
-        tag_name = web_element_a_father.get_property('tagName').json_value()
-
-        if tag_name == 'A':
-            href = web_element_a_father.get_attribute('href')
-        else:
-            lazy_a = campaign.query_selector("div>a")
-            href = lazy_a.get_attribute('href')
-    except Exception as e:
-        logging.debug(f"Error occurred getting href url: {e}")
-        traceback.print_exc()
-
-    return href
-
-
-def get_attribute_target(campaign, context):
-    target = False
-    try:
-        with context.new_page() as new_page:
-            new_page.wait_for_load_state("domcontentloaded")
-            web_element_a_father = campaign.evaluate_handle('(element) => element.parentElement')
-            tag_name = web_element_a_father.get_property('tagName')
-
-            if tag_name == 'A':
-                target = web_element_a_father.get_attribute('target')
-            else:
-                lazy_a = campaign.query_selector("div>a")
-                target = lazy_a.get_attribute('target')
-    except Exception as e:
-        logging.error(f"Error getting target attribute {e}")
-
-    return target if target is not None else False
-
-
 def scrolling_down_the_page(page, sleep=0):
     try:
         count = 1
