@@ -141,3 +141,13 @@ dmypy.json
 
 # Playwright test results
 test-results/
+
+# Allure reports
+allure-results/
+allure-report/
+
+# Allure history (optional: remove this line if you want to commit history)
+allure-history/
+
+# Allure trends (consolidated historical report)
+allure-trends/

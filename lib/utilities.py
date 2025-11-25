@@ -2,10 +2,10 @@ import logging
 import time
 import traceback
 from datetime import datetime, timezone
-from lib.config_variables import ConfigVariables
+# from lib.config_variables import ConfigVariables  # TODO: Legacy code - file doesn't exist
 import playwright
 
-variables = ConfigVariables()
+# variables = ConfigVariables()  # TODO: Legacy code - commented out
 
 
 def take_screenshot(page, source="_need_to_pass_the_source"):
