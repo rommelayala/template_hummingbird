@@ -14,12 +14,6 @@ on:
         required: false
         default: 'tests/'
         type: string
-      
-  # Opcional: Ejecutar automáticamente en push/PR
-  # push:
-  #   branches: [ main, develop ]
-  # pull_request:
-  #   branches: [ main ]
 
 jobs:
   test:
@@ -27,7 +21,7 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-      # 1. Checkout del código en la rama especificada
+      # 1. Checkout del código
       - name: 📥 Checkout código
         uses: actions/checkout@v4
         with:
@@ -40,19 +34,19 @@ jobs:
           python-version: '3.11'
           cache: 'pip'
       
-      # 3. Instalar dependencias Python
+      # 3. Instalar dependencias
       - name: 📦 Instalar dependencias
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
       
-      # 4. Instalar browsers de Playwright
+      # 4. Instalar browsers
       - name: 🌐 Instalar browsers de Playwright
         run: |
           playwright install chromium
           playwright install-deps chromium
       
-      # 5. Ejecutar tests con pytest
+      # 5. Ejecutar tests
       - name: 🧪 Ejecutar tests
         run: |
           pytest ${{ github.event.inputs.test_path || 'tests/' }} \
@@ -61,27 +55,8 @@ jobs:
             -v
         continue-on-error: true
       
-      # 6. Obtener historial de Allure (para trending)
-      - name: 📊 Obtener historial de Allure
-        uses: actions/checkout@v4
-        if: always()
-        continue-on-error: true
-        with:
-          ref: gh-pages
-          path: gh-pages
-      
-      # 7. Copiar historial anterior
-      - name: 📁 Copiar historial de reportes
-        if: always()
-        continue-on-error: true
-        run: |
-          if [ -d "gh-pages/history" ]; then
-            mkdir -p allure-results/history
-            cp -r gh-pages/history/. allure-results/history/
-          fi
-      
-      # 8. Instalar Allure CLI
-      - name: � Instalar Allure
+      # 6. Instalar Allure CLI
+      - name: 🔧 Instalar Allure
         if: always()
         run: |
           sudo wget https://github.com/allure-framework/allure2/releases/download/2.24.0/allure-2.24.0.tgz
@@ -89,15 +64,14 @@ jobs:
           sudo ln -s /opt/allure-2.24.0/bin/allure /usr/bin/allure
           allure --version
       
-      # 9. Generar reporte Allure
+      # 7. Generar reporte Allure
       - name: 📈 Generar reporte Allure
         if: always()
         run: |
           allure generate allure-results -o allure-report --clean
-          cp -r allure-report/history/. allure-results/history/ || true
       
-      # 10. Publicar reporte a GitHub Pages
-      - name: 🚀 Publicar reporte a GitHub Pages
+      # 8. Publicar a GitHub Pages
+      - name: 🚀 Publicar a GitHub Pages
         if: always()
         uses: peaceiris/actions-gh-pages@v3
         with:
@@ -105,28 +79,3 @@ jobs:
           publish_branch: gh-pages
           publish_dir: allure-report
           keep_files: false
-      
-      # 11. Subir artifacts (backup)
-      - name: 📎 Subir resultados como artifacts
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: allure-results-${{ github.run_number }}
-          path: |
-            allure-results/
-            allure-report/
-          retention-days: 30
-      
-      # 12. Comentar en PR con link al reporte (si es PR)
-      - name: 💬 Comentar link al reporte
-        if: always() && github.event_name == 'pull_request'
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const reportUrl = `https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}`;
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: `## 📊 Reporte Allure Generado\n\n✅ Los tests se ejecutaron correctamente.\n\n🔗 [Ver Reporte Completo](${reportUrl})\n\n_Ejecutado en rama: \`${{ github.event.inputs.branch || github.ref }}\`_`
-            })
