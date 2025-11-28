@@ -25,6 +25,7 @@ jobs:
       - name: 📥 Checkout código
         uses: actions/checkout@v4
         with:
+          # Si viene rama por input, la usa; si no, usa la ref del workflow
           ref: ${{ github.event.inputs.branch || github.ref }}
       
       # 2. Configurar Python
@@ -40,19 +41,19 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
       
-      # 4. Instalar browsers
+      # 4. Instalar browsers de Playwright (forma recomendada)
       - name: 🌐 Instalar browsers de Playwright
         run: |
-          playwright install chromium
-          playwright install-deps chromium
+          playwright install --with-deps chromium
       
-      # 5. Ejecutar tests
+      # 5. Ejecutar tests (genera resultados para Allure)
       - name: 🧪 Ejecutar tests
         run: |
           pytest ${{ github.event.inputs.test_path || 'tests/' }} \
             --alluredir=allure-results \
             --clean-alluredir \
             -v
+        # Queremos reporte aunque fallen los tests
         continue-on-error: true
       
       # 6. Instalar Allure CLI
