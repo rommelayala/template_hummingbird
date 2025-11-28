@@ -11,6 +11,10 @@ pytest-forked==1.6.0
 # =========================
 playwright==1.56.0
 pytest-playwright==0.7.1
+# =========================
+# Allure + pytest plugin
+# =========================
+allure-pytest
 
 # =========================
 # Linting / autoformato
