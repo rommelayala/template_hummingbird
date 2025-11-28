@@ -1,5 +1,5 @@
 "Status","Start Time","Stop Time","Duration in ms","Parent Suite","Suite","Sub Suite","Test Class","Test Method","Name","Description"
-"broken","Fri Nov 28 10:57:00 UTC 2025","Fri Nov 28 10:57:00 UTC 2025","0","tests","test_login","","","","Verificar que un login correcto redirige a la página de inventario","
+"broken","Fri Nov 28 10:59:47 UTC 2025","Fri Nov 28 10:59:47 UTC 2025","0","tests","test_login","","","","Verificar que un login correcto redirige a la página de inventario","
 Este test verifica que cuando un usuario se autentica con credenciales válidas,
 el sistema lo redirige correctamente a la página de inventario de productos.
 "
