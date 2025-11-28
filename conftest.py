@@ -16,8 +16,8 @@ def playwright_instance() -> Generator[Playwright, None, None]:
 
 @pytest.fixture(scope="session")
 def browser(playwright_instance: Playwright) -> Generator[Browser, None, None]:
-    """Lanza un navegador Chromium una vez por sesión."""
-    browser = playwright_instance.chromium.launch(headless=False)
+    headless_env = os.getenv("HEADLESS", "true").lower() == "true"
+    browser = playwright_instance.chromium.launch(headless=headless_env)
     yield browser
     browser.close()
 
