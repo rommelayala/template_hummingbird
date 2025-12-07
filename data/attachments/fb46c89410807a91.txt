@@ -1,2 +1,0 @@
-Environment: DEV
-Locators loaded: 6 elements
