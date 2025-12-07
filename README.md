@@ -23,7 +23,11 @@ playwright install chromium
 pytest
 
 # Generar reporte con historial (Recomendado)
+# Generar reporte con historial (Recomendado)
 ./run_tests_with_history.sh
+
+# Ejecutar en entorno específico (DEV, QA, STAG, PP)
+pytest --env=QA
 ```
 
 ---

@@ -45,31 +45,30 @@ def navigate_to_login_page(page: Page) -> LoginPage:
 # WHEN STEPS (Actions)
 # ============================================================================
 
-@when(parsers.parse('I enter username "{username}"'))
-def enter_username(login_page: LoginPage, username: str) -> None:
-    """
-    Enter a username in the username field.
-    
-    Args:
-        login_page: The LoginPage fixture from the Given step
-        username: The username to enter (from the Gherkin step)
-    
-    The parsers.parse() allows us to extract "{username}" from the step text.
-    """
-    with allure.step(f"Enter username: {username}"):
-        login_page.username_input.fill(username)
+from lib.resource_loader import ResourceLoader
 
-
-@when(parsers.parse('I enter password "{password}"'))
-def enter_password(login_page: LoginPage, password: str) -> None:
+@when(parsers.parse('I enter credentials for "{user_key}"'))
+def enter_credentials(login_page: LoginPage, environment: str, user_key: str) -> None:
     """
-    Enter a password in the password field.
+    Enter credentials for a specific user key.
     
-    Note: We use allure.step but don't show the actual password value
-    for security reasons in the report.
+    1. Loads user data using ResourceLoader
+    2. Fills username and password fields
     """
-    with allure.step("Enter password"):
-        login_page.password_input.fill(password)
+    with allure.step(f"Load credentials for '{user_key}'"):
+        loader = ResourceLoader(environment)
+        users = loader.load_test_data("users")
+        
+        if user_key not in users:
+            raise KeyError(f"User '{user_key}' not found in resources/{environment}/test_data/users.json")
+            
+        user = users[user_key]
+        
+    with allure.step(f"Login as {user['username']}"):
+        # Note: We use the existing page object methods which have hardcoded selectors
+        # This mixes patterns (ResourceLoader for data, POM for locators) which is fine for transition
+        login_page.username_input.fill(user["username"])
+        login_page.password_input.fill(user["password"])
 
 
 @when('I click the login button')
