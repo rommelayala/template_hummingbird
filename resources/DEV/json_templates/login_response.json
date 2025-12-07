@@ -1,0 +1,17 @@
+{
+    "status": "success",
+    "message": "Login successful",
+    "user": {
+        "id": "${any_number}",
+        "username": "${expected_username}",
+        "firstName": "${any_string}",
+        "lastName": "${any_string}",
+        "role": "standard_user"
+    },
+    "session": {
+        "token": "${any_string}",
+        "expiresIn": 3600,
+        "createdAt": "${any_datetime}"
+    },
+    "redirectUrl": "/inventory.html"
+}

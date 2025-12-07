@@ -15,12 +15,6 @@ Cómo ejecutar tests desde GitHub Actions.
 ### 📊 [03. GitHub Pages](./03-github-pages.md)
 Configuración y acceso a reportes en GitHub Pages.
 
-### 🔧 [04. Personalización](./04-customization.md)
-Cómo personalizar el workflow para tus necesidades.
-
-### 🐛 [05. Troubleshooting](./05-troubleshooting.md)
-Problemas comunes y soluciones.
-
 ---
 
 ## 🚀 Inicio Rápido
@@ -102,8 +96,9 @@ template_hummingbird/
 1. **[01-setup.md](./01-setup.md)** - Configuración inicial completa
 2. **[02-usage.md](./02-usage.md)** - Cómo usar el workflow
 3. **[03-github-pages.md](./03-github-pages.md)** - Setup de GitHub Pages
-4. **[04-customization.md](./04-customization.md)** - Personalización avanzada
-5. **[05-troubleshooting.md](./05-troubleshooting.md)** - Si algo falla
+
+> [!TIP]
+> Para personalización avanzada y troubleshooting, consulta la documentación del workflow y los ejemplos en este directorio.
 
 ---
 
@@ -128,9 +123,9 @@ Archivos generados que se pueden descargar desde GitHub Actions.
 
 ## 📞 ¿Necesitas Ayuda?
 
-1. **Revisa** [05-troubleshooting.md](./05-troubleshooting.md)
+1. **Revisa** los documentos de setup y usage
 2. **Consulta** ejemplos en [02-usage.md](./02-usage.md)
-3. **Personaliza** según [04-customization.md](./04-customization.md)
+3. **Verifica** configuración en [01-setup.md](./01-setup.md)
 
 ---
 
