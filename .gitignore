@@ -151,3 +151,11 @@ allure-history/
 
 # Allure trends (consolidated historical report)
 allure-trends/
+
+# Unified Report History
+execution-history/
+
+# Cluecumber Reports
+cluecumber-report/
+json-results/
+cucumber_report.json

@@ -157,12 +157,18 @@ pytest -n 4
 
 ## Generar Reportes Allure
 
-### 1. Con Historial (Recomendado) 🆕
-Ejecuta los tests y guarda el historial automáticamente.
+### 1. Suite Unificada (Recomendado) 🚀
+La forma moderna de ejecutar todo en un solo paso.
 
 ```bash
-./run_tests_with_history.sh
+./run_suite.sh --env=DEV --open=all
 ```
+
+**Este script realiza 4 tareas críticas:**
+1.  **Ejecuta** los tests en el entorno seleccionado.
+2.  **Crea** un directorio único con timestamp (ej. `execution-history/20231207_220000`).
+3.  **Genera** ambos reportes: **Allure** (Técnico) y **Cluecumber** (Negocio/BDD).
+4.  **Archiva** todos los resultados para mantener tendencias históricas.
 
 **Características:**
 - ✅ Ejecuta todos los tests

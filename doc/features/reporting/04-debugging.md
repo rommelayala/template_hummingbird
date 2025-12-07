@@ -269,7 +269,7 @@ ls -la allure-results/
 ```
 
 **Si está vacío:**
-- Ejecuta primero `pytest`
+- Ejecuta `./run_suite.sh`
 - Verifica `pytest.ini` tenga `--alluredir=allure-results`
 
 ---
@@ -335,7 +335,7 @@ System Preferences → Security & Privacy → Automation
 ## Problema 6: Historial No Se Guarda
 
 ### Síntoma
-`allure-history/` está vacío después de ejecutar con historial.
+`execution-history/` está vacío después de ejecutar con historial.
 
 ### Debug
 
@@ -343,34 +343,32 @@ System Preferences → Security & Privacy → Automation
 ```bash
 # ❌ INCORRECTO
 pytest
-./generate_report.sh
+./run_suite.sh --open=allure # Si falla puede ser porque no se generó antes el history con run_suite completo
 
 # ✅ CORRECTO
-./run_tests_with_history.sh
+./run_suite.sh --env=DEV
 ```
 
 ---
 
 #### 2. Verificar permisos del script
 ```bash
-ls -la run_tests_with_history.sh
-
-# Debe tener 'x' (ejecutable):
-# -rwxr-xr-x  1 user  staff  1234 Jan 25 14:30 run_tests_with_history.sh
+ls -la run_suite.sh
+# Debe tener 'x' (ejecutable)
 ```
 
 **Si no es ejecutable:**
 ```bash
-chmod +x run_tests_with_history.sh
+chmod +x run_suite.sh
 ```
 
 ---
 
 #### 3. Ejecutar con debug
 ```bash
-bash -x ./run_tests_with_history.sh 2>&1 | tee debug.log
+bash -x ./run_suite.sh --env=DEV 2>&1 | tee debug.log
 
-# Revisar debug.log para ver qué falló
+# Revisar debug.log para ver si falla el 'cp' o 'mkdir'
 ```
 
 ---
@@ -467,8 +465,8 @@ Cuando algo falle, verifica en orden:
 | JSON vacíos | Verificar `pytest.ini` |
 | Screenshots no aparecen | Verificar hook en `conftest.py` |
 | Decoradores no en reporte | Verificar `import allure` |
-| Navegador no abre | Abrir URL manualmente |
-| Historial vacío | Usar `run_tests_with_history.sh` |
+| Navegador no abre | Usar flag `--open=all` o link manual |
+| Historial vacío | Usar `./run_suite.sh` (no pytest directo) |
 
 ---
 

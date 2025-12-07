@@ -153,21 +153,26 @@ def pytest_runtest_makereport(item, call):
 
 ---
 
-## PASO 4: Guardar en Historial (opcional)
-
-### Si usaste `./run_tests_with_history.sh`:
+## PASO 4: Guardar en Historial (run_suite.sh)
+### Si usaste `./run_suite.sh`:
 
 ```bash
 # El script hace:
-TIMESTAMP=$(date +"%Y%m%d_%H%M%S")  # 20250125_143022
-mkdir -p allure-history/$TIMESTAMP/
+TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
+# Crea carpeta versionada
+mkdir -p execution-history/$TIMESTAMP/
 
-# Copia TODO allure-results
-cp -r allure-results/ allure-history/$TIMESTAMP/
+# 1. Copia Allure Results
+cp -r allure-results/ execution-history/$TIMESTAMP/
 
-# Guarda metadata
-cat > allure-history/$TIMESTAMP/metadata.txt <<EOF
-Fecha y Hora: 2025-01-25 14:30:22
+# 2. Copia Cucumber Report
+cp -r json-results/cucumber_report.json execution-history/$TIMESTAMP/cucumber_$TIMESTAMP.json
+
+# 3. Guarda metadata
+cat > execution-history/$TIMESTAMP/metadata.txt <<EOF
+Run ID: 20250125_143022
+Date: ...
+Environment: DEV
 Exit Code: 0
 Branch: main
 Commit: a1b2c3d
@@ -178,13 +183,12 @@ EOF
 
 **Resultado:**
 ```
-allure-history/
+execution-history/
 └── 20250125_143022/
-    ├── allure-results/
-    │   ├── abc123-result.json
-    │   ├── def456-container.json
-    │   └── abc123-screenshot.png
-    └── metadata.txt
+    ├── allure-results/        # Resultados Allure
+    ├── cucumber_2025...json   # Resultados Cucumber
+    ├── cluecumber-report/     # Reporte BDD generado
+    └── metadata.txt           # Info ejecución
 ```
 
 ---
@@ -350,32 +354,20 @@ fetch('data/suites.json')
 Siguiendo un test real:
 
 ```
-T+0ms     : Ejecutas ./run_tests_with_history.sh
-T+100ms   : Script inicia, lee historial anterior
-T+200ms   : pytest inicia lectura de tests
-T+500ms   : pytest lee decoradores @allure.feature
-T+600ms   : pytest ejecuta test_login_correcto()
-T+700ms   : Step 1 "Navegar a login" - ejecutado
-T+1300ms  : Step 2 "Ingresar credenciales" - ejecutado  
-T+2400ms  : Step 3 "Click en login" - ejecutado
-T+2500ms  : Assertion - PASSED
-T+2600ms  : Hook pytest_runtest_makereport llamado
-T+2650ms  : allure-pytest genera abc123-result.json
-T+2700ms  : Test completado
-T+2800ms  : Script copia allure-results/ a history/
-T+2900ms  : Script genera metadata.txt
-T+3000ms  : Script ejecuta `allure generate`
-T+3100ms  : Allure CLI lee JSON files
-T+3500ms  : Allure CLI procesa datos
-T+4000ms  : Allure CLI genera index.html
-T+4200ms  : allure-report/ completo
-T+4300ms  : Abre navegador
-T+4800ms  : Navegador carga index.html
-T+5000ms  : JavaScript renderiza reporte
-T+5200ms  : Usuario ve el reporte ✅
+T+0ms     : Ejecutas ./run_suite.sh --env=DEV --open=cluecumber
+T+100ms   : Script prepara directorios (limpia json-results)
+T+200ms   : Script copia historial previo (para tendencias)
+T+500ms   : pytest inicia (genera JSONs en allure y json-results)
+T+700ms   : Step 1.. Step 2.. Step 3...
+T+3000ms  : Test completado
+T+3200ms  : Maven genera reporte Cluecumber (desde json-results)
+T+4500ms  : Script archiva TODO en execution-history/TIMESTAMP/
+T+4800ms  : Script genera reporte Allure
+T+5500ms  : Script abre reporte Cluecumber en navegador
+T+6000ms  : Usuario ve el reporte ✅
 ```
 
-**Total:** ~5 segundos desde ejecución hasta visualización
+**Total:** ~6 segundos desde ejecución hasta visualización completa
 
 ---
 

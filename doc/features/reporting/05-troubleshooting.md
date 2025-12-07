@@ -36,7 +36,7 @@ pytest
 
 ### Síntomas
 ```bash
-./generate_report.sh
+./run_suite.sh
 # allure: command not found
 ```
 
@@ -86,7 +86,7 @@ pytest
 ls -la allure-results/*.json
 
 # 4. Generar reporte
-./generate_report.sh
+./run_suite.sh --open=allure
 ```
 
 ---
@@ -219,8 +219,8 @@ java --version
 ## Problema: Historial No Se Guarda
 
 ### Síntomas
-- Ejecutas `./run_tests_with_history.sh`
-- `allure-history/` sigue vacío
+- Ejecutas `./run_suite.sh`
+- `execution-history/` sigue vacío
 
 ### Causa
 Script no tiene permisos o hay error en ejecución.
@@ -229,18 +229,18 @@ Script no tiene permisos o hay error en ejecución.
 
 #### 1. Dar permisos
 ```bash
-chmod +x run_tests_with_history.sh
+chmod +x run_suite.sh
 ```
 
 #### 2. Ejecutar con debug
 ```bash
-bash -x ./run_tests_with_history.sh
+bash -x ./run_suite.sh --env=DEV
 ```
 
 #### 3. Verificar manualmente
 ```bash
 # Después de ejecutar, debe existir:
-ls -la allure-history/
+ls -la execution-history/
 
 # Debe mostrar carpetas con timestamp:
 # drwxr-xr-x  4 user  staff  128 Jan 25 14:30 20250125_143000
@@ -259,34 +259,29 @@ No se está copiando el `history/` folder entre ejecuciones.
 
 ### Solución
 
-#### 1. Usar el script con historial
+#### 1. Usar siempre el script maestro
 ```bash
-# ❌ NO USAR
+# ❌ NO USAR SOLAMENTE
 pytest
-./generate_report.sh
 
-# ✅ USAR
-./run_tests_with_history.sh
+# ✅ USAR SIEMPRE
+./run_suite.sh --env=DEV
 ```
 
 #### 2. El script automatically copia history
-Busca esta sección en `run_tests_with_history.sh`:
+Busca esta sección en `run_suite.sh`:
 ```bash
-if [ -d "$REPORT_DIR/history" ]; then
-    cp -r "$REPORT_DIR/history" "$RESULTS_DIR/history"
+if [ -d "allure-report/history" ]; then
+    mkdir -p "$ALLURE_RESULTS_DIR/history"
+    cp -r "allure-report/history/"* "$ALLURE_RESULTS_DIR/history/"
 fi
 ```
 
 #### 3. Ejecutar múltiples veces
 ```bash
-# Primera vez - sin trending
-./run_tests_with_history.sh
-
-# Segunda vez - empieza trending
-./run_tests_with_history.sh
-
-# Tercera vez - trending con 3 puntos
-./run_tests_with_history.sh
+./run_suite.sh --env=DEV
+./run_suite.sh --env=DEV
+./run_suite.sh --open=allure
 ```
 
 ---
@@ -389,8 +384,17 @@ pytest -n 4     # Usa 4 workers
 
 ### Síntomas
 ```bash
-./generate_report.sh
-# bash: ./generate_report.sh: Permission denied
+./run_suite.sh --open=allure
+```
+
+---
+
+## Problema: "Permission Denied" en Scripts
+
+### Síntomas
+```bash
+./run_suite.sh
+# bash: ./run_suite.sh: Permission denied
 ```
 
 ### Causa
@@ -398,13 +402,10 @@ El script no tiene permisos de ejecución.
 
 ### Solución
 ```bash
-chmod +x generate_report.sh
-chmod +x run_tests_with_history.sh
-chmod +x view_history.sh
-chmod +x view_historical_trends.sh
+chmod +x run_suite.sh
 
 # Verificar
-ls -la *.sh
+ls -la run_suite.sh
 # Debe mostrar -rwxr-xr-x
 ```
 
@@ -428,11 +429,13 @@ ls -la *.sh
 # addopts = ... --clean-alluredir
 ```
 
-#### Opción 2: Usar historial
+### Solución (Si quieres acumular resultados)
+
+#### Usar historial (Recomendado)
 ```bash
 # En lugar de pytest directo
-./run_tests_with_history.sh
-# Esto guarda en allure-history antes de limpiar
+./run_suite.sh
+# Este script gestiona el historial automáticamente en execution-history
 ```
 
 ---
@@ -459,11 +462,8 @@ page.screenshot(path=..., full_page=False)  # Solo viewport visible
 page.screenshot(path=..., quality=50)  # Para JPEG
 ```
 
-#### 3. Limitar historial
-```bash
-# En run_tests_with_history.sh
-MAX_HISTORY=10  # Reducir de 20 a 10
-```
+#### 3. Limpiar historial antiguo
+El script `run_suite.sh` acumula ejecuciones. Puedes limpiar `execution-history` manualmente de vez en cuando.
 
 ---
 
@@ -484,14 +484,14 @@ cat .gitignore | grep allure
 # Debe tener:
 allure-results/
 allure-report/
-allure-history/
-allure-trends/
+execution-history/  # ← Nuevo unified history
+json-results/
+cluecumber-report/
 
 # Si no están, agregar:
-echo "allure-results/" >> .gitignore
-echo "allure-report/" >> .gitignore
-echo "allure-history/" >> .gitignore
-echo "allure-trends/" >> .gitignore
+echo "execution-history/" >> .gitignore
+echo "json-results/" >> .gitignore
+echo "cluecumber-report/" >> .gitignore
 
 # Limpiar cache de git
 git rm -r --cached allure-results/
