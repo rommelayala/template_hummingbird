@@ -20,16 +20,30 @@ playwright install chromium
 ### 2. Ejecutar Tests
 ```bash
 # Ejecutar todos los tests
+```bash
+# ❌ NO USAR SOLAMENTE
 pytest
+
+# ✅ USAR SIEMPRE
+./run_suite.sh --env=DEV
+```
 
 # Generar reporte con historial (Recomendado)
 # Generar reporte con historial (Recomendado)
-./run_tests_with_history.sh
+# Ejecución Maestra (Recomendada) 🚀
+# Ejecuta tests, guarda historial y genera reportes Allure + Cluecumber
+```bash
+./run_suite.sh --env=DEV --open=all
+```
+# Opciones de apertura:
+# --open=allure      (Solo Allure)
+# --open=cluecumber  (Solo Cucumber HTML)
+# --open=all         (Ambos)
+
 
 # Ejecutar en entorno específico (DEV, QA, STAG, PP)
 pytest --env=QA
 ```
-
 ---
 
 ## 📚 Documentación

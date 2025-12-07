@@ -146,265 +146,43 @@ def test_login_correcto(page: Page):
 
 ## Scripts de Reportes
 
-### `generate_report.sh`
-**Ubicación:** `/generate_report.sh`  
-**Propósito:** Generar reporte simple sin historial
+### `run_suite.sh`
+**Ubicación:** `/run_suite.sh`
+**Propósito:** Script maestro para ejecución y reportes (Allure + Cluecumber)
 
-**Qué hace:**
+**Funciones principales:**
+1. **Ejecución:** Corre `pytest` con configuración para ambos reportes.
+2. **Historial:** Crea carpetas timestamped en `execution-history/`.
+3. **Limpieza:** Limpia `json-results` y `allure-results` para evitar duplicados.
+4. **Generación:** Orquesta Allure CLI y Maven Cluecumber.
+5. **Archivado:** Guarda todos los artefactos de la ejecución.
+
+**Uso:**
 ```bash
-#!/bin/bash
-# 1. Verifica que existan resultados
-if [ ! -d "allure-results" ]; then
-    echo "No hay resultados"
-    exit 1
-fi
-
-# 2. Genera y abre reporte
-allure serve allure-results
+./run_suite.sh --env=DEV --open=all
 ```
-
-**Cuándo usar:** Para ver el reporte de la última ejecución rápidamente
-
----
-
-### `run_tests_with_history.sh`
-**Ubicación:** `/run_tests_with_history.sh`  
-**Propósito:** Ejecutar tests y guardar en historial
-
-**Secciones principales:**
-
-#### 1. Variables
-```bash
-HISTORY_DIR="allure-history"
-RESULTS_DIR="allure-results"
-REPORT_DIR="allure-report"
-MAX_HISTORY=20
-```
-
-#### 2. Copiar historial anterior
-```bash
-if [ -d "$REPORT_DIR/history" ]; then
-    cp -r "$REPORT_DIR/history" "$RESULTS_DIR/history"
-fi
-```
-**¿Por qué?** Para que el nuevo reporte tenga trending del anterior
-
-#### 3. Ejecutar tests
-```bash
-pytest
-TEST_EXIT_CODE=$?
-```
-
-#### 4. Guardar en historial
-```bash
-TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
-HISTORY_SUBDIR="$HISTORY_DIR/$TIMESTAMP"
-mkdir -p "$HISTORY_SUBDIR"
-cp -r "$RESULTS_DIR" "$HISTORY_SUBDIR/"
-```
-
-#### 5. Guardar metadata
-```bash
-cat > "$HISTORY_SUBDIR/metadata.txt" <<EOF
-Fecha y Hora: $(date +"%Y-%m-%d %H:%M:%S")
-Exit Code: $TEST_EXIT_CODE
-Branch: $(git rev-parse --abbrev-ref HEAD)
-Commit: $(git rev-parse --short HEAD)
-Usuario: $(whoami)
-Host: $(hostname)
-EOF
-```
-
-#### 6. Limpiar historial antiguo
-```bash
-HISTORY_COUNT=$(ls -1 "$HISTORY_DIR" | wc -l)
-if [ "$HISTORY_COUNT" -gt "$MAX_HISTORY" ]; then
-    TO_DELETE=$((HISTORY_COUNT - MAX_HISTORY))
-    ls -1t "$HISTORY_DIR" | tail -n "$TO_DELETE" | while read old_dir; do
-        rm -rf "$HISTORY_DIR/$old_dir"
-    done
-fi
-```
-
-#### 7. Generar reporte
-```bash
-allure generate "$RESULTS_DIR" -o "$REPORT_DIR" --clean
-```
-
-**Cuándo usar:** Para ejecutar tests y mantener historial automático
-
----
-
-### `view_history.sh`
-**Ubicación:** `/view_history.sh`  
-**Propósito:** Ver un reporte histórico individual
-
-**Qué hace:**
-```bash
-# 1. Lista reportes disponibles
-for dir in $(ls -1t "$HISTORY_DIR"); do
-    # Muestra fecha, estado, etc.
-done
-
-# 2. Usuario selecciona número
-read choice
-
-# 3. Abre reporte seleccionado
-allure serve "$HISTORY_DIR/$selected_dir/allure-results"
-```
-
-**Cuándo usar:** Para revisar una ejecución pasada específica
-
----
-
-### `view_historical_trends.sh`
-**Ubicación:** `/view_historical_trends.sh`  
-**Propósito:** Ver estadísticas y tendencias consolidadas
-
-**Secciones principales:**
-
-#### 1. Análisis estadístico en consola
-```bash
-for dir in $(ls -1t "$HISTORY_DIR"); do
-    # Lee metadata
-    # Cuenta tests passed/failed
-    # Muestra tabla
-done
-```
-
-#### 2. Combinar resultados
-```bash
-for dir in $(ls -1t "$HISTORY_DIR" | head -n 10); do
-    cp -r "$HISTORY_DIR/$dir/allure-results"/* "$TRENDS_RESULTS/"
-done
-```
-
-#### 3. Generar reporte consolidado
-```bash
-allure generate "$TRENDS_RESULTS" -o "$TRENDS_DIR/report" --clean
-allure open "$TRENDS_DIR/report"
-```
-
-**Cuándo usar:** Para análisis de tendencias de todas las ejecuciones
 
 ---
 
 ## Directorios de Datos
 
+### `execution-history/`
+**Propósito:** Historial unificado de todas las ejecuciones.
+**Contenido:** Carpetas con timestamp (ej. `20251207_220000/`) que contienen:
+- `allure-results/`
+- `cluecumber-report/`
+- `cucumber.json`
+- `metadata.txt`
+
+### `cluecumber-report/`
+**Propósito:** Reporte HTML estilo BDD generado por Maven.
+**Contenido:** `index.html` y recursos CSS/JS.
+
+### `json-results/`
+**Propósito:** Directorio temporal para el `cucumber.json` de la ejecución actual. Se limpia antes de cada ejecución.
+
 ### `allure-results/`
-**Propósito:** Resultados temporales de la última ejecución
-
-**Contenido:**
-```
-allure-results/
-├── {uuid}-result.json           # Resultado de un test
-├── {uuid}-container.json        # Metadata de suite
-├── {uuid}-attachment.png        # Screenshot
-└── history/                     # Datos de trending (opcional)
-    └── history.json
-```
-
-**Ejemplo de *-result.json:**
-```json
-{
-  "uuid": "abc123",
-  "name": "test_login_correcto",
-  "status": "passed",
-  "start": 1706184000000,
-  "stop": 1706184002500,
-  "labels": [
-    {"name": "feature", "value": "Autenticación"},
-    {"name": "severity", "value": "critical"}
-  ],
-  "steps": [...],
-  "attachments": [...]
-}
-```
-
-**¿Se versiona en git?** ❌ NO (está en `.gitignore`)
-
----
-
-### `allure-report/`
-**Propósito:** Reporte HTML generado
-
-**Contenido:**
-```
-allure-report/
-├── index.html                   # Página principal
-├── app.js                       # JavaScript
-├── styles.css                   # CSS
-├── favicon.ico                  # Ícono
-├── data/
-│   ├── suites.json             # Tests procesados
-│   ├── test-cases/             # Casos individuales
-│   ├── timeline.json           # Timeline data
-│   └── graph.json              # Gráficos
-├── widgets/
-│   ├── summary.json            # Resumen
-│   ├── graph.json              # Trending
-│   └── ...
-├── history/                     # Trending data
-│   ├── duration-trend.json
-│   ├── retry-trend.json
-│   └── history.json
-└── plugins/
-    └── ...
-```
-
-**¿Se versiona en git?** ❌ NO (está en `.gitignore`)
-
----
-
-### `allure-history/`
-**Propósito:** Historial permanente (últimas 20 ejecuciones)
-
-**Contenido:**
-```
-allure-history/
-├── 20250125_163000/
-│   ├── allure-results/
-│   │   ├── {uuid}-result.json
-│   │   ├── {uuid}-container.json
-│   │   └── screenshots/
-│   │       └── test_name.png
-│   └── metadata.txt
-├── 20250125_143000/
-│   └── ...
-└── 20250125_103000/
-    └── ...
-```
-
-**Ejemplo de metadata.txt:**
-```
-Fecha y Hora: 2025-01-25 14:30:22
-Exit Code: 0
-Branch: main
-Commit: a1b2c3d
-Usuario: rommel
-Host: MacBook-Pro
-```
-
-**¿Se versiona en git?** ⚠️ Opcional (comentar línea en `.gitignore`)
-
----
-
-### `allure-trends/`
-**Propósito:** Reporte consolidado temporal
-
-**Contenido:**
-```
-allure-trends/
-├── combined-results/            # JSON combinados de 10 ejecuciones
-│   ├── {uuid}-result.json
-│   ├── {uuid}-result.json
-│   └── ...
-└── report/                      # HTML generado
-    ├── index.html
-    └── ...
-```
-
-**¿Se versiona en git?** ❌ NO (está en `.gitignore`)
+**Propósito:** Resultados temporales de Allure. Se regenera en cada ejecución.
 
 ---
 
@@ -414,22 +192,25 @@ allure-trends/
 **Ubicación:** `/.gitignore`  
 **Líneas relevantes:**
 ```gitignore
+# Unified Report History
+execution-history/
+
+# Cluecumber Reports
+cluecumber-report/
+json-results/
+cucumber_report.json
+
 # Allure reports
 allure-results/
 allure-report/
-
-# Allure history (optional)
-allure-history/
-
-# Allure trends
 allure-trends/
 ```
 
 **¿Por qué ignorar?**
-- `allure-results/` - Temporal, se regenera
-- `allure-report/` - Generado, no es código fuente
-- `allure-trends/` - Temporal, se regenera
-- `allure-history/` - Opcional, puede ser muy grande
+- `execution-history/` - Puede crecer mucho, mejor no versionar.
+- `json-results/` - Temporal, se limpia en cada run.
+- `cluecumber-report/` - Generado, no es código fuente.
+- `allure-results/` - Temporal.
 
 ---
 
@@ -441,21 +222,15 @@ pytest.ini              ← Configuración
 conftest.py             ← Hooks
 tests/*.py              ← Tests con decoradores
 allure-results/         ← Output de pytest
-allure-report/          ← Output de Allure CLI
+json-results/           ← Output para Cluecumber
 ```
 
-### Para Historial
+### Para Historial y Orquestación
 ```
-run_tests_with_history.sh  ← Script
-allure-history/            ← Almacenamiento
+run_suite.sh               ← Script Maestro
+execution-history/         ← Almacenamiento unificado
 metadata.txt               ← Info de ejecución
-```
-
-### Para Tendencias
-```
-view_historical_trends.sh  ← Script
-allure-history/            ← Fuente de datos
-allure-trends/             ← Consolidado
+cucumber_report.json       ← Fuente para Cluecumber
 ```
 
 ---
@@ -465,7 +240,7 @@ allure-trends/             ← Consolidado
 ```
 pytest.ini
     │
-    ├─► Configura dónde guardar resultados
+    ├─► Configura dónde guardar resultados (allure-results)
     └─► Activa allure-pytest plugin
             │
             ▼
@@ -477,26 +252,25 @@ pytest.ini
                     ▼
                 tests/*.py
                     │
-                    ├─► Usa fixtures
-                    ├─► Usa decoradores @allure.*
+                    ├─► Usa fixtures & decoradores
                     └─► Ejecuta con pytest
                             │
                             ▼
-                        allure-results/
+    ┌───────────────────────┴───────────────────────┐
+    │                                               │
+allure-results/ (JSON)                       json-results/ (Cucumber JSON)
+    │                                               │
+    └───────────────────────┬───────────────────────┘
+                            ▼
+                       run_suite.sh
                             │
-                            ├─► JSON files
-                            └─► Screenshots
+                            ├─► Copia a execution-history/
+                            ├─► Ejecuta 'allure generate'
+                            └─► Ejecuta 'mvn cluecumber'
                                     │
                                     ▼
-                        run_tests_with_history.sh
-                            │
-                            ├─► Copia a allure-history/
-                            └─► Ejecuta allure generate
-                                    │
-                                    ▼
-                                allure-report/
-                                    │
-                                    └─► HTML visual
+                            ┌───────┴───────┐
+                      allure-report/   cluecumber-report/
 ```
 
 ---
@@ -508,12 +282,8 @@ Para que los reportes funcionen, necesitas:
 - ✅ `pytest.ini` con `--alluredir=allure-results`
 - ✅ `conftest.py` con hook de screenshots
 - ✅ `requirements.txt` con `allure-pytest`
-- ✅ Tests con decoradores `@allure.*`
-- ✅ Allure CLI instalado (`brew install allure`)
-
-Opcionales para funciones avanzadas:
-- ⭐ `run_tests_with_history.sh` para historial
-- ⭐ `view_historical_trends.sh` para tendencias
+- ✅ `run_suite.sh` (Script Maestro)
+- ✅ `pom.xml` en `reporting/cluecumber/` (para reporte BDD)
 
 ---
 
@@ -524,11 +294,11 @@ Opcionales para funciones avanzadas:
 | `pytest.ini` | Config | Raramente | ✅ Sí |
 | `conftest.py` | Hooks | Raramente | ✅ Sí |
 | `tests/*.py` | Tests | Siempre | ✅ Sí |
-| `*.sh` | Scripts | Raramente | ✅ Sí |
+| `run_suite.sh` | Orchestrator | Raramente | ✅ Sí |
 | `allure-results/` | Datos temp | Automático | ❌ No |
-| `allure-report/` | HTML | Automático | ❌ No |
-| `allure-history/` | Historial | Automático | ⚠️ Opcional |
-| `allure-trends/` | Consolidado | Automático | ❌ No |
+| `json-results/` | Datos temp | Automático | ❌ No |
+| `execution-history/`| Historial | Automático | ❌ No |
+| `cluecumber-report/`| HTML BDD | Automático | ❌ No |
 
 ---
 

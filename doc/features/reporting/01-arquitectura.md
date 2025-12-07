@@ -115,63 +115,36 @@ allure-report/
 
 ---
 
-## Sistema de Historial
-
-### Sin Historial (Simple)
-```
-pytest ───▶ allure-results/ ───▶ allure-report/
-                                       │
-                                       ▼
-                                 Navegador
-```
-
-### Con Historial (Avanzado)
+### Unified Suite (Moderno)
 ```
 pytest ───▶ allure-results/ ───┬───▶ allure-report/
-                                │         │
-                                │         ▼
-                                │    Navegador
-                                │
-                                └───▶ allure-history/TIMESTAMP/
-                                      (guardado permanente)
+                               │         │
+                               │         ▼
+                               │    Navegador
+                               │
+                               └───▶ execution-history/TIMESTAMP/
+                                     ├── allure-results/
+                                     ├── cluecumber-report/
+                                     ├── cucumber.json
+                                     └── metadata.txt
 ```
 
-**Script:** `run_tests_with_history.sh`
+**Script:** `run_suite.sh`
 
 **Funciones adicionales:**
-1. Copia `allure-results/` a `allure-history/TIMESTAMP/`
-2. Guarda metadata (branch, commit, fecha)
-3. Mantiene solo últimas 20 ejecuciones
-4. Preserva `history/` folder para trending
+1. Ejecuta tests habilitando Allure y Cucumber JSON.
+2. Genera reporte Cluecumber via Maven.
+3. Archiva TODO en `execution-history/` con timestamp.
+4. Mantiene historial limpio.
 
 ---
 
-## Sistema de Tendencias Consolidadas
+## Sistema de Tendencias
 
-```
-allure-history/
-├── 20250125_143022/
-├── 20250125_121510/
-└── 20250125_103045/
-        │
-        ▼
-  [Combine Results]
-        │
-        ▼
-allure-trends/
-└── combined-results/ ───▶ Reporte Consolidado
-                               │
-                               ▼
-                          Navegador
-```
-
-**Script:** `view_historical_trends.sh`
-
-**Proceso:**
-1. Lee todos los reportes en `allure-history/`
-2. Combina JSONs de últimas 10 ejecuciones
-3. Genera estadísticas en consola
-4. Crea reporte HTML con trending completo
+Allure usa la carpeta `history/` dentro de `allure-results` para pintar gráficos de tendencias.
+`run_suite.sh` se encarga de:
+1. Copiar el `history/` de la ejecución anterior a la carpeta actual `allure-results/`.
+2. Así, Allure sabe "qué pasó antes" y dibuja la línea de tendencia.
 
 ---
 
@@ -230,18 +203,18 @@ Test Execution
 
 ## Almacenamiento de Datos
 
-### Temporal (Se sobrescribe)
+### Temporal (Se sobrescribe/limpia)
 ```
-allure-results/     ← Borra y regenera cada pytest
-allure-report/      ← Regenera cada allure generate
-allure-trends/      ← Regenera cada view_historical_trends.sh
+allure-results/     ← Output de pytest
+json-results/       ← Output Cucumber JSON
 ```
 
-### Permanente (Se preserva)
+### Permanente (Historial)
 ```
-allure-history/     ← Solo con run_tests_with_history.sh
-├── TIMESTAMP/      ← Guardado hasta que pase de 20
+execution-history/  ← Creado por run_suite.sh
+├── 20250125_143000/
 │   ├── allure-results/
+│   ├── cluecumber-report/
 │   └── metadata.txt
 ```
 
@@ -285,43 +258,37 @@ Crear scripts bash que combinen/procesen reportes de formas diferentes.
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │                    USUARIO                                   │
-│  Ejecuta: ./run_tests_with_history.sh                       │
+│  Ejecuta: ./run_suite.sh --env=DEV --open=all               │
 └────────────────────┬────────────────────────────────────────┘
                      │
                      ▼
 ┌─────────────────────────────────────────────────────────────┐
-│              SCRIPT: run_tests_with_history.sh               │
-│  1. Copia history anterior a allure-results/                │
-│  2. Ejecuta: pytest                                         │
-│  3. Guarda allure-results/ en allure-history/TIMESTAMP/     │
-│  4. Genera metadata.txt                                     │
-│  5. Limpia historial antiguo (mantiene 20)                  │
+│              SCRIPT: run_suite.sh                            │
+│  1. Prepara directorios (allure-results, json-results)      │
+│  2. Copia history anterior para tendencias                  │
+│  3. Ejecuta: pytest (genera JSONs)                          │
+│  4. Ejecuta: maven (genera Cluecumber)                      │
+│  5. Archiva TODO en execution-history/TIMESTAMP/            │
 │  6. Ejecuta: allure generate                                │
 └────────────────────┬────────────────────────────────────────┘
                      │
-        ┌────────────┴────────────┐
-        ▼                         ▼
-┌───────────────┐         ┌──────────────────┐
-│    pytest     │         │  allure generate │
-└───────┬───────┘         └────────┬─────────┘
-        │                          │
-        ▼                          ▼
-┌───────────────┐         ┌──────────────────┐
-│conftest.py    │         │ allure-report/   │
-│+ decorators   │         │ index.html       │
-└───────┬───────┘         └────────┬─────────┘
-        │                          │
-        ▼                          ▼
-┌───────────────┐         ┌──────────────────┐
-│allure-results/│         │   NAVEGADOR      │
-│  *.json       │         │  (Usuario ve)    │
-└───────────────┘         └──────────────────┘
-        │
-        ▼
-┌───────────────────────────┐
-│ allure-history/TIMESTAMP/ │
-│  (Guardado permanente)    │
-└───────────────────────────┘
+        ┌────────────┼────────────┐
+        ▼            ▼            ▼
+┌───────────────┐ ┌──────┐ ┌──────────────────┐
+│    pytest     │ │ Maven│ │  allure generate │
+└───────┬───────┘ └──┬───┘ └────────┬─────────┘
+        │            │              │
+        ▼            ▼              ▼
+┌───────────────┐ ┌──────┐ ┌──────────────────┐
+│allure-results/│ │Report│ │ allure-report/   │
+│json-results/  │ │ BDD  │ │ index.html       │
+└───────┬───────┘ └──┬───┘ └────────┬─────────┘
+        │            │              │
+        ▼            ▼              ▼
+┌─────────────────────────────────────────────┐
+│ execution-history/TIMESTAMP/                │
+│  (Guardado permanente de ambos reportes)    │
+└─────────────────────────────────────────────┘
 ```
 
 ---

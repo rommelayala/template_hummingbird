@@ -187,16 +187,16 @@ Ejecutar tests múltiples veces y ver tendencias.
 ### Comandos
 ```bash
 # Primera ejecución
-./run_tests_with_history.sh
+./run_suite.sh --env=DEV
 
 # Segunda ejecución (cambia algo en el código)
-./run_tests_with_history.sh
+./run_suite.sh --env=DEV
 
 # Tercera ejecución
-./run_tests_with_history.sh
+./run_suite.sh --env=DEV
 
-# Ver tendencias consolidadas
-./view_historical_trends.sh
+# Abrir reportes para ver historial
+./run_suite.sh --open=allure
 ```
 
 ### Output Esperado
@@ -294,7 +294,7 @@ class TestCarrito:
 ### Ejecutar
 ```bash
 pytest tests/test_suite_completa.py -v
-./generate_report.sh
+./run_suite.sh --open=allure
 ```
 
 ### Output Esperado
@@ -366,7 +366,7 @@ pytest tests/test_login.py::test_login_correcto -vv
 
 ### Paso 2: Inspeccionar el reporte
 ```bash
-./generate_report.sh
+./run_suite.sh --open=allure
 # Navegador abre automáticamente
 ```
 
@@ -400,17 +400,13 @@ pytest tests/test_login.py::test_login_correcto
 # Test individual
 pytest tests/test_file.py::test_name -v
 
-# Test con historial
-./run_tests_with_history.sh
+# Ejecutar Suite con Reportes (Allure + Cluecumber)
+./run_suite.sh --env=DEV --open=all
 
-# Ver reporte simple
-./generate_report.sh
-
-# Ver reporte histórico
-./view_history.sh
-
-# Ver tendencias
-./view_historical_trends.sh
+# Opciones de apertura:
+# --open=allure      (Solo Allure)
+# --open=cluecumber  (Solo Cucumber HTML)
+# --open=all         (Ambos)
 
 # Inspeccionar JSON
 cat allure-results/*-result.json | python3 -m json.tool

@@ -39,18 +39,15 @@ El sistema de reportes Allure convierte los resultados de tus tests en reportes 
 ### Scripts Principales
 
 ```bash
-# Ejecutar tests con historial
-./run_tests_with_history.sh
+# 🚀 Suite Unificada (Ejecuta, Historial, Allure + Cluecumber)
+./run_suite.sh --env=DEV --open=all
 
-# Ver reporte histórico individual
-./view_history.sh
-
-# Ver tendencias consolidadas
-./view_historical_trends.sh
-
-# Reporte simple sin historial
-./generate_report.sh
+# Opciones individuales:
+# --open=allure      -> Abre solo Allure
+# --open=cluecumber  -> Abre solo Reporte Cucumber
 ```
+
+
 
 ---
 
@@ -74,10 +71,9 @@ template_hummingbird/
 │
 ├── conftest.py               # Hooks para screenshots
 ├── pytest.ini                # Config de Allure
-├── generate_report.sh        # Script simple
-├── run_tests_with_history.sh # Script con historial
-├── view_history.sh           # Ver históricos
-└── view_historical_trends.sh # Ver tendencias
+├── pytest.ini                # Config de Allure
+├── run_suite.sh              # 🚀 Suite Unificada
+└── execution-history/        # Historial unificado
 ```
 
 ---
