@@ -1,0 +1,27 @@
+{
+    "username_input": {
+        "type": "css",
+        "value": "#user-name",
+        "description": "Username input field",
+        "wait_strategy": "visible"
+    },
+    "password_input": {
+        "type": "css",
+        "value": "#password",
+        "description": "Password input field",
+        "wait_strategy": "visible"
+    },
+    "login_button": {
+        "type": "css",
+        "value": "#login-button",
+        "description": "Login submit button",
+        "wait_strategy": "clickable"
+    },
+    "error_message": {
+        "type": "css",
+        "value": "h3[data-test='error']",
+        "description": "Error message container",
+        "wait_strategy": "visible",
+        "optional": true
+    }
+}

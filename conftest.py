@@ -7,6 +7,57 @@ import allure
 from playwright.sync_api import Playwright, sync_playwright, Browser, BrowserContext, Page
 
 
+# ============================================================================
+# COMMAND LINE OPTIONS (Maven-like)
+# ============================================================================
+
+def pytest_addoption(parser):
+    """Add custom command line options."""
+    parser.addoption(
+        "--env",
+        action="store",
+        default="DEV",
+        help="Environment to run tests against: DEV, QA, STAG, PP"
+    )
+
+
+@pytest.fixture(scope="session")
+def environment(request):
+    """Get environment from command line."""
+    return request.config.getoption("--env")
+
+
+# ============================================================================
+# BDD TAG TO MARKER CONVERSION
+# ============================================================================
+
+def pytest_bdd_apply_tag(tag, function):
+    """
+    Convert Gherkin tags to pytest markers automatically.
+    
+    This hook is called by pytest-bdd for each @tag in .feature files.
+    It applies the tag as a pytest marker so you can filter with -m.
+    
+    Example:
+        Feature file has: @smoke @critical
+        You can run: pytest -m smoke
+    """
+    # Remove @ if present
+    marker_name = tag.lstrip('@')
+    
+    # Apply marker to the test function
+    if hasattr(function, 'pytestmark'):
+        function.pytestmark.append(pytest.mark.__getattr__(marker_name))
+    else:
+        function.pytestmark = [pytest.mark.__getattr__(marker_name)]
+    
+    return True
+
+
+# ============================================================================
+# PLAYWRIGHT FIXTURES
+# ============================================================================
+
 @pytest.fixture(scope="session")
 def playwright_instance() -> Generator[Playwright, None, None]:
     """Inicia Playwright una vez por sesión de tests."""
@@ -39,6 +90,10 @@ def page(context: BrowserContext) -> Generator[Page, None, None]:
     yield page
     page.close()
 
+
+# ============================================================================
+# ALLURE SCREENSHOT ON FAILURE
+# ============================================================================
 
 @pytest.hookimpl(tryfirst=True, hookwrapper=True)
 def pytest_runtest_makereport(item, call):

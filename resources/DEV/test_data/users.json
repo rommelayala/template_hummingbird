@@ -1,0 +1,31 @@
+{
+    "valid_users": [
+        {
+            "type": "standard",
+            "username": "standard_user",
+            "password": "secret_sauce",
+            "role": "standard",
+            "description": "Standard user with full access"
+        },
+        {
+            "type": "problem",
+            "username": "problem_user",
+            "password": "secret_sauce",
+            "role": "problem",
+            "description": "User with UI problems"
+        }
+    ],
+    "invalid_users": [
+        {
+            "type": "locked",
+            "username": "locked_out_user",
+            "password": "secret_sauce",
+            "expected_error": "Epic sadface: Sorry, this user has been locked out.",
+            "description": "User that has been locked out"
+        }
+    ],
+    "default_credentials": {
+        "username": "standard_user",
+        "password": "secret_sauce"
+    }
+}
