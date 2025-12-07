@@ -1,31 +1,22 @@
 {
-    "valid_users": [
-        {
-            "type": "standard",
-            "username": "standard_user",
-            "password": "secret_sauce",
-            "role": "standard",
-            "description": "Standard user with full access"
-        },
-        {
-            "type": "problem",
-            "username": "problem_user",
-            "password": "secret_sauce",
-            "role": "problem",
-            "description": "User with UI problems"
-        }
-    ],
-    "invalid_users": [
-        {
-            "type": "locked",
-            "username": "locked_out_user",
-            "password": "secret_sauce",
-            "expected_error": "Epic sadface: Sorry, this user has been locked out.",
-            "description": "User that has been locked out"
-        }
-    ],
-    "default_credentials": {
+    "valid_user": {
         "username": "standard_user",
         "password": "secret_sauce"
+    },
+    "locked_out_user": {
+        "username": "locked_out_user",
+        "password": "secret_sauce"
+    },
+    "problem_user": {
+        "username": "problem_user",
+        "password": "secret_sauce"
+    },
+    "performance_glitch_user": {
+        "username": "performance_glitch_user",
+        "password": "secret_sauce"
+    },
+    "invalid_user": {
+        "username": "invalid_user",
+        "password": "wrong_password"
     }
 }

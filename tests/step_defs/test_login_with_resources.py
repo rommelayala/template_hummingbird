@@ -46,26 +46,30 @@ def navigate_to_login_page(page: Page, environment: str):
     }
 
 
-@when(parsers.parse('I enter username "{username}"'))
-def enter_username(test_context: dict, username: str):
-    """Enter username using locator from ResourceLoader."""
+@when(parsers.parse('I enter credentials for "{user_key}"'))
+def enter_credentials(test_context: dict, user_key: str):
+    """Enter username and password for a specific user key."""
     page = test_context['page']
+    loader = test_context['loader']
     locators = test_context['locators']
     
-    with allure.step(f"Enter username: {username}"):
-        # Get locator from resources
+    with allure.step(f"Load credentials for '{user_key}'"):
+        # Load user data
+        users_data = loader.load_test_data("users")
+        if user_key not in users_data:
+            raise KeyError(f"User '{user_key}' not found in users.json")
+        
+        user = users_data[user_key]
+        username = user["username"]
+        password = user["password"]
+    
+    with allure.step(f"Enter credentials for {username}"):
+        # Get locators
         username_locator = locators["username_input"]["value"]
-        page.locator(username_locator).fill(username)
-
-
-@when(parsers.parse('I enter password "{password}"'))
-def enter_password(test_context: dict, password: str):
-    """Enter password using locator from ResourceLoader."""
-    page = test_context['page']
-    locators = test_context['locators']
-    
-    with allure.step("Enter password"):
         password_locator = locators["password_input"]["value"]
+        
+        # Fill fields
+        page.locator(username_locator).fill(username)
         page.locator(password_locator).fill(password)
 
 
