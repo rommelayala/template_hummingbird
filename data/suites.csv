@@ -1,9 +1,4 @@
 "Status","Start Time","Stop Time","Duration in ms","Parent Suite","Suite","Sub Suite","Test Class","Test Method","Name","Description"
-"passed","Fri Nov 28 11:06:30 UTC 2025","Fri Nov 28 11:06:30 UTC 2025","286","tests","test_login","","","","Verificar que credenciales incorrectas muestran mensaje de error","
-Este test verifica que cuando un usuario intenta autenticarse con credenciales incorrectas,
-el sistema muestra un mensaje de error apropiado sin permitir el acceso.
-"
-"passed","Fri Nov 28 11:06:30 UTC 2025","Fri Nov 28 11:06:30 UTC 2025","403","tests","test_login","","","","Verificar que un login correcto redirige a la página de inventario","
-Este test verifica que cuando un usuario se autentica con credenciales válidas,
-el sistema lo redirige correctamente a la página de inventario de productos.
-"
+"passed","Sun Dec 07 19:44:20 UTC 2025","Sun Dec 07 19:44:21 UTC 2025","458","tests.step_defs","test_login_steps","","","","test_failed_login_with_invalid_credentials","/home/runner/work/template_hummingbird/template_hummingbird/tests/features/login.feature: Failed login with invalid credentials"
+"passed","Sun Dec 07 19:44:19 UTC 2025","Sun Dec 07 19:44:20 UTC 2025","1757","tests.step_defs","test_login_steps","","","","test_successful_login_with_valid_credentials","/home/runner/work/template_hummingbird/template_hummingbird/tests/features/login.feature: Successful login with valid credentials"
+"broken","Sun Dec 07 19:44:21 UTC 2025","Sun Dec 07 19:44:21 UTC 2025","417","tests.step_defs","test_login_with_resources","","","","test_successful_login_with_valid_credentials","/home/runner/work/template_hummingbird/template_hummingbird/tests/features/login.feature: Successful login with valid credentials"
